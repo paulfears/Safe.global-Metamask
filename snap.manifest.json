@@ -1,0 +1,38 @@
+{
+  "version": "0.0.1",
+  "description": "A safe.global manager",
+  "proposedName": "Safe.global",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MetaMask/snap-simple-keyring.git"
+  },
+  "source": {
+    "shasum": "I33eHVVC83EfJxOH0Bwqs0S3luDhEE58VWXyi3jePck=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "iconPath": "images/icon.svg",
+        "packageName": "safe-global-snap",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "snap_dialog": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": false
+    },
+    "snap_manageAccounts": {},
+    "snap_manageState": {},
+    "endowment:network-access": {},
+    "snap_getEntropy": {},
+    "endowment:ethereum-provider": {},
+    "snap_getBip44Entropy": [
+      {
+        "coinType": 9001
+      }
+    ]
+  },
+  "manifestVersion": "0.1"
+}

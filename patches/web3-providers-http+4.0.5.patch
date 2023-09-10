@@ -1,0 +1,13 @@
+diff --git a/node_modules/web3-providers-http/src/index.ts b/node_modules/web3-providers-http/src/index.ts
+index 64dadd9..20eafe5 100644
+--- a/node_modules/web3-providers-http/src/index.ts
++++ b/node_modules/web3-providers-http/src/index.ts
+@@ -15,7 +15,7 @@ You should have received a copy of the GNU Lesser General Public License
+ along with web3.js.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-import fetch from 'cross-fetch';
++//import fetch from 'cross-fetch';
+ import {
+ 	EthExecutionAPI,
+ 	JsonRpcResponseWithResult,

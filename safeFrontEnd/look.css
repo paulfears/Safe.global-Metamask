@@ -1,0 +1,62 @@
+
+
+h1{
+    font-family: 'Noto Sans Shavian', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-family: 'Raleway', sans-serif;
+    font-size: 70px;
+    margin-left: 5%;
+}
+
+.app-content{
+    height: 40vh;
+    
+    margin-right: 20%;
+    margin-left:5%;
+    border: 1px solid black;
+   
+    position: relative;
+}
+/*
+button{
+    padding: 15px;
+    padding-left: 25px;
+    padding-right: 25px;
+    color:white;
+    background-color: #16DB93;
+    border-radius: 25px;
+    font-size: 20px;
+    border: 3px solid white;
+    transition: 0.2s;
+    cursor: pointer;
+}
+*/
+
+button{
+    padding: 15px;
+    padding-left: 25px;
+    padding-right: 25px;
+    color:black;
+    background-color: white;
+    
+    font-size: 20px;
+    border: 1px solid black;
+    transition: 0.2s;
+    cursor: pointer;
+    
+}
+
+button:hover {/*background-color: #00d184;*/ font-size: 25.01px; }
+
+.content-span{
+    display: flex;
+    justify-content: right;
+    padding: 10px;
+    
+}
+
+
+
+.spacer{
+    width: 5vh;
+}
