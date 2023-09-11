@@ -68,7 +68,7 @@ export class MetamaskCaller{
             method: 'proposeTxn',
             params:{
               safeAddress:safeAddress.toString(),
-              txn:JSON.stringify(txn)
+              txn:txn
             }
           },
         },
