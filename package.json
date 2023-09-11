@@ -19,7 +19,7 @@
     "snap.manifest.json"
   ],
   "scripts": {
-    "build": "vite build ./svelteFrontEnd --outDir ../site_dist",
+    "build": "cd svelteFrontEnd && yarn && vite build --outDir ../site_dist",
     "build:clean": "yarn clean && yarn build",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
