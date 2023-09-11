@@ -46,6 +46,7 @@
     "@safe-global/protocol-kit": "^1.2.0",
     "@safe-global/safe-core-sdk-types": "^2.3.0",
     "@safe-global/safe-deployments": "^1.27.0",
+    "@sveltejs/vite-plugin-svelte": "^2.4.5",
     "browserify": "^17.0.0",
     "buffer": "^6.0.3",
     "ethers": "<6",
