@@ -3,7 +3,8 @@
     import { linear, sineInOut, elasticInOut, quadInOut, quintInOut } from 'svelte/easing';
 
     import {ethers} from 'ethers';
-    import {SnapId, currentAddress, SafeAPIKit, SafeInfo, snapAddress} from '../store'
+    import {currentAddress, SafeAPIKit, SafeInfo, snapAddress} from '../store'
+    import {snapId} from '../constants';
     import { Button, Modal, GradientButton } from 'flowbite-svelte';
     import { Label, Input } from 'flowbite-svelte';
     import {MetamaskCaller} from '../utils/MetamaskCaller'
@@ -14,7 +15,7 @@
     //setup
     let accountAdded = ($SafeInfo)[safeAddress].deligates.includes($snapAddress);
     
-    const metamaskCaller = new MetamaskCaller($SnapId);
+    const metamaskCaller = new MetamaskCaller(snapId);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
@@ -35,7 +36,7 @@
         const signerAddress = await window.ethereum.request({
           method: 'wallet_invokeSnap',
           params: {
-              snapid: $SnapId,
+              snapId: snapId,
               request: {
                 method: 'getSignerAddress',
                 params: {
@@ -70,7 +71,7 @@
         const signerAddress = await window.ethereum.request({
           method: 'wallet_invokeSnap',
           params: {
-              snapId: $SnapId,
+              snapId: snapId,
               request: {
                 method: 'getSignerAddress',
               }

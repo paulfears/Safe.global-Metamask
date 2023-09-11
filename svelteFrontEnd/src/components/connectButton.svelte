@@ -4,9 +4,10 @@
     import SafeApiKit from '@safe-global/api-kit';
     import { Web3Adapter } from '@safe-global/protocol-kit'
     import {connected, currentAddress, Safes, SafeInfo, SafeAPIKit, SnapId, snapAddress} from '../store'
+    import {snapId} from '../constants'
     import {MetamaskCaller} from '../utils/MetamaskCaller'
     
-    const metamaskCaller = new MetamaskCaller($SnapId);
+    const metamaskCaller = new MetamaskCaller(snapId);
 
     async function switchToTestnet(){
         try {
@@ -51,11 +52,10 @@
             info[safeAddr]['deligates'] = Array.from((await safeApiKit.getSafeDelegates({safeAddress:safeAddr})).results.map((item)=>item.delegate));
         }
         $SafeInfo = info;
-        console.log($SnapId);
         const signerAddress = await window.ethereum.request({
           method: 'wallet_invokeSnap',
           params: {
-              snapId: $SnapId,
+              snapId: snapId,
               request: {
                 method: 'getSignerAddress',
               }

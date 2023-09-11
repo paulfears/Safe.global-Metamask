@@ -1,7 +1,8 @@
 <script lang="ts">
     import { Button, Listgroup, ListgroupItem, Tabs, TabItem, Modal, Input, Label} from "flowbite-svelte";
     import type {SafeMultisigTransactionListResponse} from '@safe-global/api-kit'
-    import { SafeAPIKit, SnapId, SafeInfo } from "../store";
+    import { SafeAPIKit, SafeInfo } from "../store";
+    import {snapId} from '../constants'
     import {ethers} from 'ethers';
     import {MetamaskCaller} from '../utils/MetamaskCaller'
     //props
@@ -16,7 +17,7 @@
     let safeInfo = $SafeInfo[safeAddress]
     console.log(safeInfo);
     //apis
-    const metamaskCaller = new MetamaskCaller($SnapId);
+    const metamaskCaller = new MetamaskCaller(snapId);
     //functions
     async function loadPendingTransactions(){
         const pendingTxs: SafeMultisigTransactionListResponse = await $SafeAPIKit.getPendingTransactions(safeAddress);

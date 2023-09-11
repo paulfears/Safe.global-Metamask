@@ -2,8 +2,7 @@
   "name": "safe-global-snap",
   "version": "0.0.1",
   "description": "A simple keyring snap that integrates with safe.global",
-  "keywords": [
-  ],
+  "keywords": [],
   "homepage": "https://github.com/MetaMask/snap-simple-keyring#readme",
   "bugs": {
     "url": "https://github.com/MetaMask/snap-simple-keyring/issues"
@@ -20,7 +19,7 @@
     "snap.manifest.json"
   ],
   "scripts": {
-    "build": "mm-snap build",
+    "build": "vite build ./svelteFrontEnd --outDir ../site_dist",
     "build:clean": "yarn clean && yarn build",
     "clean": "rimraf dist",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
@@ -80,7 +79,8 @@
     "prettier-plugin-packagejson": "^2.2.11",
     "rimraf": "^3.0.2",
     "through2": "^4.0.2",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "vite": "^4.4.9"
   },
   "packageManager": "yarn@1.22.19",
   "engines": {

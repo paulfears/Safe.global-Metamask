@@ -3,7 +3,8 @@ import {
   } from '@metamask/keyring-api';
 
 
-const snapId = `local:http://localhost:8080/`
+import { snapId } from '../constants';
+
 export class MetamaskCaller{
     snapid:string
     client: KeyringSnapRpcClient
