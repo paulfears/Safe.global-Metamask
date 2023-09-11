@@ -1209,7 +1209,7 @@
   dependencies:
     debug "^4.3.4"
 
-"@sveltejs/vite-plugin-svelte@^2.4.2":
+"@sveltejs/vite-plugin-svelte@^2.4.5":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-2.4.5.tgz#55ba60ce37dfa3acf76b4ec54955011a34cd49a2"
   integrity sha512-UJKsFNwhzCVuiZd06jM/psscyNJNDwjQC+qIeb7GBJK9iWeQCcIyfcPWDvbCudfcJggY9jtxJeeaZH7uny93FQ==
