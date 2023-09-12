@@ -38,11 +38,10 @@ export class AccountManager{
         
         const keyRing: KeyringAccount = {
             id: uuid(),
-            options: null,
+            options: {},
             address: safeAddress,
             methods: [
               'eth_signTransaction',
-              'eth_sign',
               'eth_signTypedData_v1',
               'eth_signTypedData_v3',
               'eth_signTypedData_v4',
@@ -51,6 +50,7 @@ export class AccountManager{
             ],
             type: 'eip155:eoa',
           };
+          console.log(keyRing);
           state.keyRingWallets.push(keyRing);
 
           await AccountManager.saveState(state);

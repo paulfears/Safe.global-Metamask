@@ -57,6 +57,7 @@ export class SimpleKeyring implements Keyring {
 
 
   async createAccount(
+    name:string,
     options: Record<string, Json> | null = null,
   ): Promise<KeyringAccount> {
     console.log("inside create Account");
@@ -76,11 +77,11 @@ export class SimpleKeyring implements Keyring {
 
     const account: KeyringAccount = {
       id: uuid(),
+      name:name,
       options: options,
       address: options.safeAddress.toString(),
-      methods: [
+      supportedMethods: [
         'eth_signTransaction',
-        'eth_sign',
         'eth_signTypedData_v1',
         'eth_signTypedData_v3',
         'eth_signTypedData_v4',
@@ -155,7 +156,7 @@ export class SimpleKeyring implements Keyring {
     console.log(request);
     console.log(method);
     
-    const signature = this.#handleSigningRequest(method, params);
+    const signature = this.handleSigningRequest(method, params);
     return {
       pending: false,
       result: signature,
@@ -177,7 +178,7 @@ export class SimpleKeyring implements Keyring {
 
 
 
-  #handleSigningRequest(method: string, params: Json): Json {
+  handleSigningRequest(method: string, params: Json): Json {
     switch (method) {
       case 'personal_sign': {
         const [from, message] = params as string[];
