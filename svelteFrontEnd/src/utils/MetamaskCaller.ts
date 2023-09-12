@@ -36,7 +36,7 @@ export class MetamaskCaller{
 
     async createAccount(name:string, safeAddress:string, type: 'deligator' | 'signer' | 'observer'){
         console.log("in create Accounts");
-        const account = await this.client.createAccount({name, safeAddress, type});
+        const account = await this.client.createAccount(name, safeAddress, type);
         console.log(account);
         return account;
     }

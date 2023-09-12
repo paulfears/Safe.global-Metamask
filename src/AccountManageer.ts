@@ -21,6 +21,7 @@ export class AccountManager{
     static loaded:boolean = false;
 
     static async addAccount(safeAddress:string, name:string, type:'deligate' | 'creator' | 'owner' | 'observer'){
+        console.log("in add Account");
         let accounts: LoadedAccounts
         if(!AccountManager.loaded){
             await AccountManager.reFreshState()
@@ -35,12 +36,18 @@ export class AccountManager{
             type: type,
             safeAddress: safeAddress
         }
-        
+        console.log("name is: ");
+        console.log(name);
+        console.log("safeAddress");
+        console.log(safeAddress);
+        console.log("type is: ");
+        console.log(type);
         const keyRing: KeyringAccount = {
             id: uuid(),
+            name: name,
             options: {},
             address: safeAddress,
-            methods: [
+            supportedMethods: [
               'eth_signTransaction',
               'eth_signTypedData_v1',
               'eth_signTypedData_v3',

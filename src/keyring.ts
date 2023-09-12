@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import { Common, Hardfork } from '@ethereumjs/common';
+
 import { JsonTx, TransactionFactory } from '@ethereumjs/tx';
 
 import {
@@ -9,14 +9,10 @@ import {
   SubmitRequestResponse,
 } from '@metamask/keyring-api';
 import type { Json, JsonRpcRequest } from '@metamask/utils';
-import { Buffer } from 'buffer';
 import { v4 as uuid } from 'uuid';
 import { SigningMethods } from './permissions';
 import {
   isEvmChain,
-  serializeTransaction,
-  isUniqueAccountName,
-  isUniqueAddress,
 } from './util';
 import { AccountManager } from './AccountManageer';
 
@@ -82,6 +78,7 @@ export class SimpleKeyring implements Keyring {
       address: options.safeAddress.toString(),
       supportedMethods: [
         'eth_signTransaction',
+        'eth_sendTransaction',
         'eth_signTypedData_v1',
         'eth_signTypedData_v3',
         'eth_signTypedData_v4',

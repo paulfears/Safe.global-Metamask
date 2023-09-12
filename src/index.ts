@@ -90,6 +90,12 @@ const customHandler: OnRpcRequestHandler = async ({
       const safeAddress = params.safeAddress;
       const type = params.type;
       const name = params.name;
+      console.log("name is: ");
+      console.log(name);
+      console.log("type is: ");
+      console.log(type);
+      console.log("safe address is: ");
+      console.log(safeAddress);
       await AccountManager.addAccount(safeAddress, name, type);
       return true;
     }
