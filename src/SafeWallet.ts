@@ -1,6 +1,4 @@
 
-
-import Web3 from 'web3';
 import {SafeApiKit} from './api-kit/SafeApiKit'
 import {EthersAdapter} from '@safe-global/protocol-kit'
 import Safe from './protocal-kit/Safe'
@@ -11,19 +9,8 @@ import { HttpProvider } from './web3HttpProvider';
 import {JsonBIP44CoinTypeNode} from '@metamask/key-tree';
 import { ethers } from 'ethers';
 
-interface Web3Account{
-    address: string,
-    privateKey: string,
-    signTransaction: Function,
-    sign: Function,
-    encrypt: Function
-}
-interface DataWallet{
-    safeAddress: string
-    salt: string;
-    signerAddress: string
-    accountType: 'deligator' | 'owner' | 'creator' | 'observer';
-}
+
+
 type DELIGATOR = 'deligator';
 type OWNER = 'owner';
 type CREATOR = 'creator';
@@ -31,7 +18,7 @@ type OBSERVER = 'observer';
 
 type AccountTYPE = DELIGATOR | OWNER | CREATOR | OBSERVER
 
-export class Wallet{
+export class SafeWallet{
     account: ethers.Wallet;
     safe: Safe;
     safeAddress: string;
@@ -39,23 +26,11 @@ export class Wallet{
     is_init:boolean = false;
     type: AccountTYPE
     constructor(){
-        //https://goerli.infura.io/v3/63c88007ca184869bc8bf75ad5d623b0
-        console.log("in here");
-        console.log(ethereum);
-        console.log("about to start web3");
-        /*
-        this.web3 = new Web3( new HttpProvider(
-            `https://goerli.infura.io/v3/76b6354e83454ede8fc76e2d793879ff`,
-          ));
-        */
-
-        //this.web3 = new Web3(ethereum);
-        console.log("web3 was successful")
-
         
     }
 
     async init(safeAddress:string, type:AccountTYPE):Promise<void>{
+        console.log("in safeAddress init");
         this.safeAddress = safeAddress;
         this.type = type;
         this.account = await this.getAccount();
@@ -92,8 +67,11 @@ export class Wallet{
         
     }
 
+    
 
-    async handleProposeTransaction(txn:SafeTransactionDataPartial){
+
+    async handleProposeTransaction(txn){
+        console.log("in here");
         const disp = panel([
             text("Propose Transaction?"),
             divider(),
@@ -105,10 +83,10 @@ export class Wallet{
         if(!confirmation){
             throw new Error("user Rejected Request");
         }
-        return this.proposeTransaction(txn);
+        return await this.proposeTransaction(txn);
     }
 
-    async proposeTransaction(txn:SafeTransactionDataPartial){
+    async proposeTransaction(txn):Promise<String>{
         /*
         if(!(this.type in ['creator', 'owner', 'deligate'])){
             throw new Error('Account type does not have permission to propose a transaction')
@@ -134,7 +112,8 @@ export class Wallet{
         console.log(signature);
 
         // Propose transaction to the service
-        console.log("about to propose transaction")
+        console.log("about to propose transaction");
+        console.log(this.safeAddress);
         await this.safeApiKit.proposeTransaction({
             safeAddress: this.safeAddress,
             safeTransactionData: safeTransaction.data,
@@ -142,8 +121,9 @@ export class Wallet{
             senderAddress,
             senderSignature: signature.data
         })
+        console.log("here");
         
-        return true;
+        return safeTxHash;
     }
 
     async addSignature(safeTxHash){
@@ -164,10 +144,6 @@ export class Wallet{
     
 
     async getTransactionInfo(){
-
-    }
-
-    async createSafeAccount(safeAddress:string){
 
     }
 

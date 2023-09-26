@@ -4,18 +4,14 @@ import {
   handleKeyringRequest,
 } from '@metamask/keyring-api';
 import type { JsonRpcRequest, OnRpcRequestHandler } from '@metamask/snaps-types';
-import { JsonStruct } from '@metamask/utils';
-import { panel, heading, text } from '@metamask/snaps-ui';
-import { AccountManager } from './AccountManageer';
+import { AccountManager } from './AccountManager';
 import { SimpleKeyring } from './keyring';
-import { InternalMethod, PERMISSIONS } from './permissions';
 import { getState } from './stateManagement';
-import { logRequest } from './util';
-import { Wallet } from './WalletEthers';
+import { SafeWallet } from './SafeWallet';
 
 let keyring: SimpleKeyring;
 
-const walletapi = new Wallet();
+const walletapi = new SafeWallet();
 
 /**
  * Log the requests.

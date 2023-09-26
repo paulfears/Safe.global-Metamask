@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
-import { JsonTx, TransactionFactory } from '@ethereumjs/tx';
-
+import { JsonTx } from '@ethereumjs/tx';
+import { ethers } from 'ethers';
 import {
   Keyring,
   KeyringAccount,
@@ -10,11 +10,11 @@ import {
 } from '@metamask/keyring-api';
 import type { Json, JsonRpcRequest } from '@metamask/utils';
 import { v4 as uuid } from 'uuid';
-import { SigningMethods } from './permissions';
+import { jsonTx_to_safeTransaction } from './util';
 import {
   isEvmChain,
 } from './util';
-import { AccountManager } from './AccountManageer';
+import { AccountManager } from './AccountManager';
 
 export type KeyringState = {
   wallets: Record<string, Wallet>;
@@ -28,9 +28,10 @@ export type Wallet = {
 
 export class SimpleKeyring implements Keyring {
 
-
+  walletInstance;
+  dataWallet;
   constructor(walletInsance ) {
-
+    this.walletInstance = walletInsance;
   }
 
   async getAccount(id:string): Promise<KeyringAccount>{
@@ -60,45 +61,13 @@ export class SimpleKeyring implements Keyring {
     if(!options.safeAddress){
       throw new Error(`Must specify Safe Address`)
     }
+    if(!options.type){
+      throw new Error('must specify account type');
+    }
     console.log(options);
-    /*
-    if (!isUniqueAccountName(String(options.name), Object.values(this.#wallets))) {
-      throw new Error(`Account name already in use: ${name}`);
-    }
 
-    if (!isUniqueAddress(String(options.safeAddress), Object.values(this.#wallets))) {
-      throw new Error(`Account address already in use: ${String(options.safeAddress)}`);
-    }
-    */
-
-    const account: KeyringAccount = {
-      id: uuid(),
-      name:name,
-      options: options,
-      address: options.safeAddress.toString(),
-      supportedMethods: [
-        'eth_signTransaction',
-        'eth_sendTransaction',
-        'eth_signTypedData_v1',
-        'eth_signTypedData_v3',
-        'eth_signTypedData_v4',
-        'eth_signTypedData',
-        'personal_sign',
-      ],
-      type: 'eip155:eoa',
-    };
     
-    console.log("state savved");
-    console.log("about to sync accounts");
-    await snap.request({
-      method: 'snap_manageAccounts',
-      params: {
-        method: 'createAccount',
-        params: account ,
-      },
-    });
-    console.log("manage accounts complete");
-    return account;
+    return AccountManager.addAccount((options.safeAddress as string), name, (options.type as string));
   }
 
   async filterAccountChains(_id: string, chains: string[]): Promise<string[]> {
@@ -150,10 +119,11 @@ export class SimpleKeyring implements Keyring {
   // of pending requests to be approved or rejected by the user.
   async submitRequest(request: KeyringRequest): Promise<SubmitRequestResponse> {
     const { method, params = '' } = request.request as JsonRpcRequest;
+    console.log("submitRequest called!");
     console.log(request);
     console.log(method);
     
-    const signature = this.handleSigningRequest(method, params);
+    const signature = await this.handleSigningRequest(method, params);
     return {
       pending: false,
       result: signature,
@@ -175,7 +145,7 @@ export class SimpleKeyring implements Keyring {
 
 
 
-  handleSigningRequest(method: string, params: Json): Json {
+  async handleSigningRequest(method: string, params: Json): Promise<Json|string> {
     switch (method) {
       case 'personal_sign': {
         const [from, message] = params as string[];
@@ -184,19 +154,38 @@ export class SimpleKeyring implements Keyring {
       }
 
       case 'eth_sendTransaction': {
+        console.log("in eth_SendTransaction");
+        let [from, tx, opts] = params as [string, any, Json];
+        tx = jsonTx_to_safeTransaction(tx);
+        from = ethers.utils.getAddress(from);
+        console.log("method is: ");
         console.log(method);
+        console.log("params is: ");
         console.log(params);
-        return "null";
+        console.log("tx is --------------")
+        console.log(tx);
+        const safeWallet = await AccountManager.getSafeWalletByAddress(from);
+        console.log("got safe wallet");
+        console.log(safeWallet);
+        let txhash = await safeWallet.handleProposeTransaction(tx);
+        console.log("final tx hash is");
+        console.log(txhash);
+        return txhash.toLowerCase();
       }
       case 'eth_signTransaction':
-      case SigningMethods.SignTransaction: {
-
+      {
+        console.log("in eth_signTransaction")
         const [from, tx, opts] = params as [string, JsonTx, Json];
         console.log("here");
         console.log(from);
         console.log(tx);
+        for(let key in tx){
+          console.log(key);
+          console.log(tx[key]);
+        }
         console.log(opts);
-        null;
+
+        return {'hello':null} as Json;
         //return this.#signTransaction(from, tx, opts);
       }
 
@@ -217,6 +206,7 @@ export class SimpleKeyring implements Keyring {
 
       case 'eth_sign': {
         const [from, data] = params as [string, string];
+        
         
       }
 
