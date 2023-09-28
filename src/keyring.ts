@@ -26,12 +26,10 @@ export type Wallet = {
   salt: String;
 };
 
-export class SimpleKeyring implements Keyring {
-
-  walletInstance;
-  dataWallet;
-  constructor(walletInsance ) {
-    this.walletInstance = walletInsance;
+export class SafeKeyring implements Keyring {
+  
+  constructor() {
+    
   }
 
   async getAccount(id:string): Promise<KeyringAccount>{
@@ -53,10 +51,8 @@ export class SimpleKeyring implements Keyring {
 
 
 
-  async createAccount(
-    name:string,
-    options: Record<string, Json> | null = null,
-  ): Promise<KeyringAccount> {
+  async createAccount(name:string, options: Record<string, Json> | null = null): Promise<KeyringAccount> 
+  {
     console.log("inside create Account");
     if(!options.safeAddress){
       throw new Error(`Must specify Safe Address`)
@@ -65,7 +61,6 @@ export class SimpleKeyring implements Keyring {
       throw new Error('must specify account type');
     }
     console.log(options);
-
     
     return AccountManager.addAccount((options.safeAddress as string), name, (options.type as string));
   }
@@ -122,7 +117,16 @@ export class SimpleKeyring implements Keyring {
     console.log("submitRequest called!");
     console.log(request);
     console.log(method);
-    
+    if(method === 'eth_sendTransaction'){
+      const result:Json = await this.handleEthSendTransaction(params);
+      console.log("successfully returned here");
+      console.log(result);
+      const output:SubmitRequestResponse = {
+        pending: false,
+        result
+      }
+      return output
+    }
     const signature = await this.handleSigningRequest(method, params);
     return {
       pending: false,
@@ -142,35 +146,34 @@ export class SimpleKeyring implements Keyring {
     );
   }
 
+  async handleEthSendTransaction(params): Promise<Json>{
+    console.log("in eth_SendTransaction");
+    let [from, tx, opts] = params as [string, any, Json];
+    tx = jsonTx_to_safeTransaction(tx);
+    from = ethers.utils.getAddress(from);
+    console.log("method is: ");
+    console.log("eth_sendTransaction");
+    console.log("params is: ");
+    console.log(params);
+    console.log("tx is --------------")
+    console.log(tx);
+    const safeWallet = await AccountManager.getSafeWalletByAddress(from);
+    console.log("got safe wallet");
+    console.log(safeWallet);
+    let txhash = await safeWallet.handleProposeTransaction(tx);
+    console.log("final tx hash is");
+    console.log(txhash);
+    console.log(typeof txhash);
+    return {"hash":txhash as string};
+  }
 
 
-
-  async handleSigningRequest(method: string, params: Json): Promise<Json|string> {
+  async handleSigningRequest(method: string, params: Json): Promise<Json | string> {
     switch (method) {
       case 'personal_sign': {
         const [from, message] = params as string[];
         throw new Error("not implemented yet");
         //return this.#signPersonalMessage(from, message);
-      }
-
-      case 'eth_sendTransaction': {
-        console.log("in eth_SendTransaction");
-        let [from, tx, opts] = params as [string, any, Json];
-        tx = jsonTx_to_safeTransaction(tx);
-        from = ethers.utils.getAddress(from);
-        console.log("method is: ");
-        console.log(method);
-        console.log("params is: ");
-        console.log(params);
-        console.log("tx is --------------")
-        console.log(tx);
-        const safeWallet = await AccountManager.getSafeWalletByAddress(from);
-        console.log("got safe wallet");
-        console.log(safeWallet);
-        let txhash = await safeWallet.handleProposeTransaction(tx);
-        console.log("final tx hash is");
-        console.log(txhash);
-        return txhash.toLowerCase();
       }
       case 'eth_signTransaction':
       {

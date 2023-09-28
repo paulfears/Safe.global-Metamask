@@ -66,7 +66,7 @@ export class Utils {
         },
         });
         
-        return confirm;
+        return confirm as boolean;
     }
 
     static async sendAlert(title: string, info: string): Promise<boolean>{

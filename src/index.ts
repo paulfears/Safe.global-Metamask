@@ -5,29 +5,12 @@ import {
 } from '@metamask/keyring-api';
 import type { JsonRpcRequest, OnRpcRequestHandler } from '@metamask/snaps-types';
 import { AccountManager } from './AccountManager';
-import { SimpleKeyring } from './keyring';
-import { getState } from './stateManagement';
-import { SafeWallet } from './SafeWallet';
+import { SafeKeyring } from './keyring';
 
-let keyring: SimpleKeyring;
+let keyring: SafeKeyring;
 
-const walletapi = new SafeWallet();
 
-/**
- * Log the requests.
- *
- * @param args - Request arguments.
- * @param args.origin - Caller origin.
- * @param args.request - Request to execute.
- * @returns Nothing, always throws `MethodNotSupportedError`.
- */
-const loggerHandler: OnRpcRequestHandler = async ({ origin, request }) => {
-  console.log(
-    `[Snap] request (id=${request.id ?? 'null'}, origin=${origin}):`,
-    request,
-  );
-  throw new MethodNotSupportedError(request.method);
-};
+
 
 /**
  * Handle keyring requests.
@@ -39,12 +22,8 @@ const loggerHandler: OnRpcRequestHandler = async ({ origin, request }) => {
 const keyringHandler: OnRpcRequestHandler = async ({ request }) => {
   console.log(request);
   if (!keyring) {
-    const keyringState = await getState();
-    if (!keyring) {
-      keyring = new SimpleKeyring(keyringState);
-    }
+    keyring = new SafeKeyring();
   }
-  console.log(keyring);
 
   return await handleKeyringRequest(keyring, request);
 };
@@ -61,13 +40,14 @@ const customHandler: OnRpcRequestHandler = async ({
 }): Promise<any> => {
   const params = request?.params;
   if(params?.clearState === true){
+    console.log("clearing State");
     AccountManager.clearState();
   }
   switch (request.method) {
     // internal methods
     
     case "getSignerAddress": {
-      return (await walletapi.getAccount()).address
+      return (await AccountManager.getEthersWallet()).address
     }
 
     case "proposeTxn":{
@@ -76,7 +56,7 @@ const customHandler: OnRpcRequestHandler = async ({
       console.log(params);
       console.log(params.txn);
       const txn = params.txn;
-      await walletapi.init(safeAddress, "deligator");
+      const walletapi = await AccountManager.getSafeWalletByAddress(safeAddress);
       return await walletapi.handleProposeTransaction(txn);
       
     }
@@ -103,7 +83,6 @@ const customHandler: OnRpcRequestHandler = async ({
 };
 
 export const onRpcRequest: OnRpcRequestHandler = buildHandlersChain(
-  loggerHandler,
-  keyringHandler,
   customHandler,
+  keyringHandler,
 );

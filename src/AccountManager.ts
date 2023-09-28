@@ -4,14 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { KeyringAccount } from "@metamask/keyring-api";
 import { ethers } from "ethers";
 import { SafeWallet } from "./SafeWallet";
-
-export interface DataWallet{
-    type: 'deligator' | 'creator' | 'owner' | 'observer',
-    name: string,
-    id: string,
-    safeAddress: string,
-    runPreFlight: boolean
-}
+import {JsonBIP44CoinTypeNode} from '@metamask/key-tree';
+import { DataWallet } from "./types";
 
 interface stateStructure{
     keyRingWallets: KeyringAccount[],
@@ -20,9 +14,62 @@ interface stateStructure{
 
 export type LoadedAccounts = {[key: string]: (DataWallet|Json)} 
 
+
+const CHAINS = [
+    'https://safe-transaction-arbitrum.safe.global/', 
+    'https://safe-transaction-aurora.safe.global/',
+    'https://safe-transaction-avalanche.safe.global/',
+    'https://safe-transaction-base.safe.global/',
+    'https://safe-transaction-base-testnet.safe.global/',
+    'https://safe-transaction-bsc.safe.global/',
+    'https://safe-transaction-bsc.safe.global/',
+    'https://safe-transaction-celo.safe.global/',
+    'https://safe-transaction-mainnet.safe.global/', //eth mainnet
+    'https://safe-transaction-gnosis-chain.safe.global/',
+    'https://safe-transaction-goerli.safe.global/',
+    'https://safe-transaction-optimism.safe.global/',
+    'https://safe-transaction-polygon.safe.global/',
+]
+    
+
 export class AccountManager{
     static state:stateStructure = {keyRingWallets:[], dataWallets:{}}
     static loaded:boolean = false;
+
+    static async runPreFlight(address:string):Promise<Boolean>{
+        if(!AccountManager.loaded){
+            await AccountManager.reFreshState()
+        }
+        else{
+            console.log("account manager already loaded");
+        }
+        const account:DataWallet = AccountManager.state.dataWallets[address];
+        if(account.runPreFlight === false){
+            return true
+        }
+        if(account.type === 'deligator'){
+            
+        }
+        if(account.type === 'owner'){
+
+        }
+        return true
+    }
+    static async getEthersWallet(): Promise<ethers.Wallet>{
+        // By way of example, we will use Dogecoin, which has `coin_type` 3.
+        const ethNode = (await snap.request({
+            method: 'snap_getBip44Entropy',
+            params: {
+            coinType: 9001,
+            
+            },
+        })) as JsonBIP44CoinTypeNode;
+        
+        const RPC_URL='https://eth-goerli.public.blastapi.io'
+        const provider = new ethers.providers.JsonRpcProvider(RPC_URL)
+        const wallet = new ethers.Wallet(ethNode.privateKey, provider);
+        return wallet;   
+    }
 
     static async addAccount(safeAddress:string, name:string, type:'deligator' | 'creator' | 'owner' | 'observer'){
         console.log("in add Account");
@@ -32,7 +79,8 @@ export class AccountManager{
         }
         
         let state = AccountManager.state;
-        
+        console.log("ADDING ACCOUNT safeADDRESS is ------------------->");
+        console.log(safeAddress);
         const id = uuid();
         state.dataWallets[safeAddress] = {
             id, 
@@ -72,7 +120,7 @@ export class AccountManager{
           return keyRing;
     }
 
-    static async getSafeWalletByAddress(address:string):Promise<SafeWallet>{
+    static async getSafeWalletByAddress(address:string, chainCode?:string):Promise<SafeWallet>{
         console.log("in getSafeWalletByAddress");
         console.log(`address is ${address}`);
         address = ethers.utils.getAddress(address);
@@ -91,10 +139,12 @@ export class AccountManager{
         }
         console.log("data Wallet is");
         console.log(AccountManager.state.dataWallets[address]);
-        const safeWallet = new SafeWallet();
+        const dataWallet:DataWallet = AccountManager.state.dataWallets[address];
+    
+
+        const safeWallet = await SafeWallet.init(dataWallet);
         console.log("safe wallet is");
         console.log(safeWallet);
-        await safeWallet.init(address, AccountManager.state.dataWallets[address].type)
         return safeWallet;
     }
 

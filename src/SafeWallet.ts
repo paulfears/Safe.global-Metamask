@@ -5,10 +5,9 @@ import Safe from './protocal-kit/Safe'
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types'
 import { panel, text, heading, divider, copyable, Panel } from '@metamask/snaps-ui';
 import { Utils } from './Metamask';
-import { HttpProvider } from './web3HttpProvider';
 import {JsonBIP44CoinTypeNode} from '@metamask/key-tree';
 import { ethers } from 'ethers';
-
+import { DataWallet } from './types';
 
 
 type DELIGATOR = 'deligator';
@@ -18,45 +17,69 @@ type OBSERVER = 'observer';
 
 type AccountTYPE = DELIGATOR | OWNER | CREATOR | OBSERVER
 
+
+
 export class SafeWallet{
     account: ethers.Wallet;
     safe: Safe;
     safeAddress: string;
-    safeApiKit;
+    safeApiKit: SafeApiKit;
     is_init:boolean = false;
     type: AccountTYPE
-    constructor(){
-        
-    }
-
-    async init(safeAddress:string, type:AccountTYPE):Promise<void>{
-        console.log("in safeAddress init");
-        this.safeAddress = safeAddress;
+    safeAccount: DataWallet
+    txServiceUrl:string
+    constructor(safe:Safe, account:ethers.Wallet, type:AccountTYPE, safeApiKit:SafeApiKit, txServiceUrl:string, safeAccount:DataWallet, safeAddress:string){
+        this.safe = safe;
+        this.account = account;
         this.type = type;
-        this.account = await this.getAccount();
-        console.log("about to create Web3 Adapter");
-        const ethAdapter = new EthersAdapter({ethers, signerOrProvider:this.account});
-        console.log("about to create Safe");
-        this.safe = await Safe.create({ ethAdapter:ethAdapter, safeAddress:this.safeAddress});
-        console.log("about to init safeAPIKit");
-        this.safeApiKit = new SafeApiKit({
-            txServiceUrl: 'https://safe-transaction-goerli.safe.global',
+        this.safeApiKit = safeApiKit;
+        this.txServiceUrl = txServiceUrl;
+        this.safeAccount = safeAccount;
+        this.safeAddress = safeAddress;
+        this.is_init = true;
+    }
+    static async init(dataWallet:DataWallet, txServiceUrl='https://safe-transaction-goerli.safe.global'):Promise<SafeWallet>{
+        console.log("in safeAddress init");
+        const safeAccount = dataWallet;
+        const safeAddress = dataWallet.safeAddress;
+        const type = dataWallet.type;
+        const account = await SafeWallet.getAccount();
+        const ethAdapter = new EthersAdapter({ethers, signerOrProvider:account});
+        const safe = await Safe.create({ ethAdapter:ethAdapter, safeAddress:safeAddress});
+        const safeApiKit = new SafeApiKit({
+            txServiceUrl: txServiceUrl,
             ethAdapter: ethAdapter
         })
         console.log("wallet init successful")
-        this.is_init = true;
+        const safeWallet = new SafeWallet(safe, account, type, safeApiKit, txServiceUrl, safeAccount, safeAddress);
+        console.log("SafeWallet is: ;)");
+        console.log(safeWallet)
+        return safeWallet;
     }
 
     
 
+    async runPreFlight():Promise<Boolean>{
 
+        if(this.safeAccount.runPreFlight === false){
+            return true
+        }
+        if(this.safeAccount.type === 'deligator'){
+            
+        }
+        if(this.safeAccount.type === 'owner'){
 
-    async getAccount(): Promise<ethers.Wallet>{
+        }
+        return true
+    }
+
+    static async getAccount(): Promise<ethers.Wallet>{
         // By way of example, we will use Dogecoin, which has `coin_type` 3.
         const ethNode = (await snap.request({
             method: 'snap_getBip44Entropy',
             params: {
             coinType: 9001,
+            
             },
         })) as JsonBIP44CoinTypeNode;
         
